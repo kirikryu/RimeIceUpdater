@@ -1,22 +1,51 @@
-# This workflow will build a Swift project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-swift
+# Build RimeIceUpdater.app with build.sh (plain swiftc project, not SwiftPM),
+# upload it as a workflow artifact, and attach it to a Release on tag push.
+# Tag builds are named RimeIceUpdater-<tag>-arm64.zip; branch builds use the
+# short commit SHA instead.
 
-name: Swift
+name: Build
 
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    tags: [ "v*" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
-
-    runs-on: macos-latest
-
+    runs-on: macos-15
     steps:
     - uses: actions/checkout@v4
-    - name: Build
-      run: swift build -v
-    - name: Run tests
-      run: swift test -v
+
+    - name: Build app
+      run: ./build.sh
+
+    - name: Package zip
+      run: |
+        if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+          name="RimeIceUpdater-$GITHUB_REF_NAME-arm64"
+        else
+          name="RimeIceUpdater-$(git rev-parse --short HEAD)-arm64"
+        fi
+        # ditto (not zip) keeps the app bundle's symlinks, permissions and
+        # ad-hoc signature intact.
+        ditto -c -k --keepParent build/RimeIceUpdater.app "build/$name.zip"
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: RimeIceUpdater-app
+        path: build/*.zip
+        if-no-files-found: error
+
+    - name: Attach zip to release
+      if: github.ref_type == 'tag'
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        zip=$(ls build/*.zip)
+        gh release create "$GITHUB_REF_NAME" "$zip" --generate-notes --verify-tag \
+          || gh release upload "$GITHUB_REF_NAME" "$zip" --clobber
