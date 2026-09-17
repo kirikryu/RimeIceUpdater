@@ -43,7 +43,7 @@
 
 ## 系统要求
 
-- macOS 15+
+- macOS 15+，Apple Silicon（M 系列芯片）
 - Squirrel（鼠须管）输入法，配置目录 `~/Library/Rime`
 
 ## 文件布局
@@ -82,7 +82,15 @@
 ./build.sh   # 产物: build/RimeIceUpdater.app（ad-hoc 签名）
 ```
 
-需要 Xcode Command Line Tools（swiftc）。引擎逻辑修改只需编辑 `Resources/update-rime-ice-dicts.sh`（保持纯 ASCII），
+前置依赖只有 Xcode Command Line Tools（提供 `swiftc`、`codesign`）：全新 Mac 上首次运行会弹窗
+提示安装，点「安装」等下载完成（约 1–2 GB）后自动继续，无需完整 Xcode；其余工具（bash、plutil 等）
+macOS 均自带。
+
+运行方式：在终端中 `cd` 到仓库目录执行 `bash build.sh`，或右键 `build.sh` → 打开方式 → 终端
+（双击默认会用文本编辑器打开，不会执行）。脚本结束时会停留等按键，输出与报错不会随窗口消失；
+本地构建的产物没有隔离属性，不会被 Gatekeeper 拦截。
+
+引擎逻辑修改只需编辑 `Resources/update-rime-ice-dicts.sh`（保持纯 ASCII），
 也可以发布后在「脚本」页直接改已安装副本。
 
 ## 设计取舍

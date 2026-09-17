@@ -19,7 +19,7 @@ you choose, then Squirrel is redeployed and the result is pushed to Notification
 
 ## Requirements
 
-- macOS 15+
+- macOS 15+ on Apple Silicon (M-series)
 - [Squirrel](https://github.com/rime/squirrel) (Rime input method for macOS), user directory `~/Library/Rime`
 
 ## How It Works
@@ -55,7 +55,15 @@ helper and editor draft — dictionaries and logs are kept.
 ./build.sh   # output: build/RimeIceUpdater.app (ad-hoc signed)
 ```
 
-Requires Xcode Command Line Tools (`swiftc`).
+The only prerequisite is Xcode Command Line Tools (provides `swiftc` and `codesign`): on a fresh
+Mac the first run pops up an install dialog — click **Install** and the build continues once the
+~1–2 GB download finishes; no full Xcode needed. Everything else (`bash`, `plutil`, …)
+ships with macOS.
+
+Run it from Terminal (`cd` into the repo, then `bash build.sh`), or right-click `build.sh` →
+Open With → Terminal (double-clicking opens it in a text editor instead of running it).
+The script pauses for a keypress before exiting, so output and errors stay visible; locally
+built copies carry no quarantine attribute and are not blocked by Gatekeeper.
 
 ## License
 

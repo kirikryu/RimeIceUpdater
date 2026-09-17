@@ -8,6 +8,18 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+# A double-clicked script closes its Terminal window on exit, hiding the
+# build output and errors; pause before exiting when run interactively.
+finish() {
+    local status=$?
+    [ "$status" -eq 0 ] || echo "build failed (exit $status)"
+    if [ -t 0 ]; then
+        printf '\nPress Enter to close... '
+        IFS= read -r _
+    fi
+}
+trap finish EXIT
+
 APP="build/RimeIceUpdater.app"
 rm -rf build
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
