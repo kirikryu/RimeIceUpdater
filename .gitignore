@@ -1,0 +1,6 @@
+# build artifacts (regenerate with ./build.sh)
+build/
+Resources/RimeNotify.app/
+.DS_Store
+.zcode/
+.mimosa/
