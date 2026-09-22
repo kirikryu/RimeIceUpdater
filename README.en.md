@@ -2,68 +2,119 @@
 
 English | [中文](README.md)
 
-A macOS window app that keeps the [rime-ice](https://github.com/iDvel/rime-ice) dictionaries
-up to date — **no [plum](https://github.com/rime/plum), no command line**. Install once, and
-the official dictionaries are checked, downloaded and installed automatically on the schedule
-you choose, then Squirrel is redeployed and the result is pushed to Notification Center.
+A macOS app that keeps the [rime-ice](https://github.com/iDvel/rime-ice) dictionaries up to date. No plum, no command line.
 
-> Note: the app UI and notifications are currently in Chinese only.
+Install once, and the dictionaries are checked, downloaded and deployed automatically on the schedule you set, with results pushed as system notifications.
 
-## Quick Start
+## Features
 
-1. Drag `RimeIceUpdater.app` into `/Applications` and **right-click → Open** it once
-   (the app is ad-hoc signed, so the first launch needs this to bypass Gatekeeper);
-2. On the **Status** page click **Install & enable auto-update**;
-3. Done. Update results arrive as notifications; reopen the app anytime to check status
-   or change settings.
+- One-click install and enable; updates then run as a launchd job, so the app can be closed
+- Check on a weekly schedule, choosing a day and time; runs missed during sleep catch up on wake
+- Results delivered as system notifications
+- Edit the update script and proxy settings in the app; script edits are auto-saved as a draft
+- Status page shows the installed dictionary version, last result, next run time, and checks the Rime directory
+- Reinstalling is safe: missing files are created, existing config and the loaded schedule are left alone
 
-## Requirements
+## Install
 
-- macOS 15+ on Apple Silicon (M-series)
-- [Squirrel](https://github.com/rime/squirrel) (Rime input method for macOS), user directory `~/Library/Rime`
+Download the latest zip from [Releases](https://github.com/kirikryu/RimeIceUpdater/releases) and unzip it to get `RimeIceUpdater.app`.
 
-## How It Works
+Requires macOS 15 or later on Apple Silicon. [Squirrel](https://github.com/rime/squirrel) must be installed and launched at least once, so that `~/Library/Rime` exists.
 
-Scheduled updates run through a launchd agent, so the app does not need to stay open —
-close the window and updates continue. The engine is a battle-hardened bash script
-(version gating, retry on failure, concurrency lock) that downloads the latest rime-ice
-`full.zip` through your proxy and triggers a Squirrel redeploy; a small helper app
-(`RimeNotify.app`) posts the result notifications. The app itself handles installation,
-settings, a graphical script editor and status display.
+1. Drag `RimeIceUpdater.app` into your Applications folder.
+2. Right-click it in Finder and choose Open. The app is unsigned, and this is required the first time to get past Gatekeeper. If it is still blocked, go to System Settings → Privacy & Security and click Open Anyway.
+3. On the Status page, click the large install button.
 
-## Key Settings
+After that, checks, downloads and deployment run as a launchd job, and the app can be closed. Open it again when you want to change settings.
+
+## Usage
+
+### Status
+
+The app opens on this page. It shows the installed dictionary version, the last run result, the schedule and next run time, and checks the Rime directory.
+
+- `Check Now`: run an update immediately, with live output
+- `Open Log`: reveal `update.log` in Finder
+- Before installation, the page shows a single large install button
+
+### Settings
 
 | Setting | Description |
 |---|---|
-| Schedule | Day of week (Mon–Sun, default Monday) + hour; runs missed during sleep catch up on wake |
-| Notifications | Turn off result notifications (logging continues) |
-| Proxy address/port | Always used for GitHub access (default `127.0.0.1:7890`) |
-| FlClash management | Auto-start/restart FlClash when the proxy is down, quit self-started instances afterwards |
+| Schedule | Day of week and time to run, Monday by default. Runs missed during sleep catch up on wake |
+| Notifications | Turn off to stop result notifications; the log is still written |
+| Proxy host / port | Used by the engine to reach GitHub, default `127.0.0.1:7890` |
+| Manage FlClash | When on, starts or restarts the proxy app if the proxy is unreachable, and closes instances it started. When off, only the system proxy is used, and the check is skipped if the proxy is down |
+| Bundle ID | Bundle identifier of the managed proxy app, default `com.follow.clash` |
 
-Settings are saved in `~/Library/Rime/scripts/updater.conf`; reinstalling only creates it
-when missing, so hand edits are preserved.
+Settings live in `~/Library/Rime/scripts/updater.conf` and can be edited by hand. The app only creates the file when it is missing, and never overwrites manual edits.
 
-## Files & Uninstall
+### Update script
 
-Everything installs under `~/Library/Rime/scripts/` (engine script, config, helper app,
-logs, status files). Uninstall from **Settings → Uninstall**: removes the schedule, script,
-helper and editor draft — dictionaries and logs are kept.
+Settings → Advanced → Update Script opens the update engine for viewing and editing.
+
+- When installed, edits apply to the copy in `~/Library/Rime/scripts/`; otherwise the built-in version is shown
+- `Save and Install` writes to disk and takes effect immediately, no reload needed
+- `Restore Built-in` upgrades an older install to the engine shipped with this version, or reverts manual edits
+- The script must be pure ASCII (for compatibility with macOS's bash 3.2); the footer counts non-ASCII characters as you type
+
+Edits are auto-saved as a draft at `scripts/.editor-draft`, which survives closing the window or quitting. Installing or discarding clears it.
+
+## FAQ
+
+- **I'm not getting notifications.** Go to System Settings → Notifications → RimeNotify and allow notifications. To diagnose, run:
+
+  ```
+  ~/Library/Rime/scripts/RimeNotify.app/Contents/MacOS/RimeNotify --status
+  ```
+
+  `auth=2` means it is working.
+
+- **"Cannot verify the developer" when opening.** Right-click the app in Finder and choose Open. If it is still blocked, go to System Settings → Privacy & Security and click Open Anyway.
+
+- **It keeps saying GitHub is unreachable.** Check that the proxy is up and the port matches your settings. In manual proxy mode, the system proxy must be enabled.
+
+- **Do updates still run after I close the window?** Yes. Updates run as a system launchd job, independent of whether the app is open. Open it again when you want to change settings.
+
+- **Why can't I choose a different dictionary directory?** Squirrel hardcodes the user directory to `~/Library/Rime`. The installer offers no option, and neither the config files nor librime provide a way to override it, so the updater has to write there. If that path is a symlink, writes go through to the real location, which the Status page displays.
+
+## Files
+
+All files live in `~/Library/Rime/scripts/`, except for the launchd job:
+
+- `update-rime-ice-dicts.sh` — the update engine, editable in the app
+- `updater.conf` — settings, safe to edit by hand
+- `.editor-draft` — draft of uninstalled script edits
+- `RimeNotify.app` — helper app that delivers system notifications
+- `update.log` — run log, rotated to `update.log.1` past 1 MB
+- `last-version` — installed dictionary version
+- `last-status` — last run result, read by the Status page
+
+The launchd job lives at `~/Library/LaunchAgents/local.rime-ice-dict-updater.plist`.
+
+## Uninstall
+
+In Settings, click `Uninstall…` at the bottom and confirm. This removes the launchd job, the update script, the notification helper, and the draft. Dictionaries and logs are kept.
+
+You can reinstall at any time from Settings → Advanced → Update Script. To remove the app entirely, drag `RimeIceUpdater.app` to the Trash.
 
 ## Build
 
+Build from source. Intended for development and debugging only.
+
 ```bash
-./build.sh   # output: build/RimeIceUpdater.app (ad-hoc signed)
+./build.sh   # output: build/RimeIceUpdater.app, ad-hoc signed
 ```
 
-The only prerequisite is Xcode Command Line Tools (provides `swiftc` and `codesign`): on a fresh
-Mac the first run pops up an install dialog — click **Install** and the build continues once the
-~1–2 GB download finishes; no full Xcode needed. Everything else (`bash`, `plutil`, …)
-ships with macOS.
+Xcode Command Line Tools is the only dependency, providing `swiftc` and `codesign`. On a fresh Mac, the first run prompts to install it; click Install and wait for the download, about 1–2 GB. Full Xcode is not needed. Everything else, such as bash and plutil, ships with macOS.
 
-Run it from Terminal (`cd` into the repo, then `bash build.sh`), or right-click `build.sh` →
-Open With → Terminal (double-clicking opens it in a text editor instead of running it).
-The script pauses for a keypress before exiting, so output and errors stay visible; locally
-built copies carry no quarantine attribute and are not blocked by Gatekeeper.
+In a terminal, `cd` into the repository and run `bash build.sh`. You can also right-click `build.sh` in Finder and choose Open With → Terminal. Double-clicking opens it in a text editor instead of running it. The script pauses at the end, so output and errors stay on screen.
+
+Locally built binaries carry no quarantine attribute and are not blocked by Gatekeeper.
+
+To change the engine logic, edit `Resources/update-rime-ice-dicts.sh`, keeping it pure ASCII. After release, you can also edit the installed copy from Settings → Advanced → Update Script.
+
+Design decisions are documented in [DESIGN.md](DESIGN.md) (Chinese).
 
 ## License
 
