@@ -118,4 +118,6 @@ Design decisions are documented in [DESIGN.md](DESIGN.md) (Chinese).
 
 ## License
 
-[MIT](LICENSE)
+[GPL-3.0](LICENSE)
+
+Versions up to and including v1.0.0 were released under the MIT License.

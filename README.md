@@ -112,8 +112,10 @@
 
 引擎逻辑的修改在 `Resources/update-rime-ice-dicts.sh`，保持纯 ASCII。发布后也可以直接在「设置 → 高级 → 更新脚本」中修改已安装的副本。
 
-设计决策的完整记录见 [DESIGN.md](DESIGN.md)。
+“设计决策”的完整记录见 [DESIGN.md](DESIGN.md)。
 
 ## 许可证
 
-[MIT](LICENSE)
+[GPL-3.0](LICENSE)
+
+v1.0.0 及之前的历史版本以 MIT 发布。

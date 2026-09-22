@@ -1,6 +1,6 @@
 # 设计取舍
 
-维护者笔记，记录 RimeIceUpdater 的设计决策与背景。使用说明见 [README](README.md)。
+记录 RimeIceUpdater 的设计决策与AI的豆蒸过程。使用说明见 [README](README.md)。
 
 - 普通窗口而非菜单栏常驻：这是个“设置完就能关”的工具，定时更新由 launchd 负责，常驻状态栏没有意义；
   关窗即退出，未保存的脚本修改靠 `.editor-draft` 草稿跨会话保留；
