@@ -1,0 +1,6 @@
+/* English display name; zh variants live in zh.lproj, other languages fall
+   back here via CFBundleDevelopmentRegion, mirroring the app's L() rule.
+   CFBundleName is localized too: LaunchServices derives the Finder/Dock/menu
+   display name from the localized CFBundleName on modern macOS. */
+"CFBundleDisplayName" = "rime-ice Dict Updater";
+"CFBundleName" = "rime-ice Dict Updater";

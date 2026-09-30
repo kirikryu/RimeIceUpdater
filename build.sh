@@ -40,11 +40,15 @@ codesign --force -s - Resources/RimeNotify.app
 
 echo "[3/4] embedding Info.plist..."
 plutil -lint Resources/Info.plist
+plutil -lint Resources/*.lproj/InfoPlist.strings
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 
 echo "[4/4] embedding resources + signing..."
 cp Resources/update-rime-ice-dicts.sh "$APP/Contents/Resources/"
 cp -R Resources/RimeNotify.app "$APP/Contents/Resources/RimeNotify.app"
+# localized display name (Finder/Dock/app menu pick per system language);
+# zh ships as zh + zh-Hans + zh_CN because LS language matching is picky
+for d in Resources/*.lproj; do cp -R "$d" "$APP/Contents/Resources/"; done
 codesign --force -s - "$APP"
 
 echo "built: $PWD/$APP"

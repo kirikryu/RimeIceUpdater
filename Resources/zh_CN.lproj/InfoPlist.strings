@@ -1,0 +1,3 @@
+/* zh_CN legacy naming (i4Tools et al.); same content as zh.lproj. */
+"CFBundleDisplayName" = "雾凇词库更新器";
+"CFBundleName" = "雾凇词库更新器";

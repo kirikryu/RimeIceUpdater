@@ -1,0 +1,6 @@
+/* bare zh matches Chinese variants not covered by zh-Hans/zh-CN lprojs,
+   mirroring isZh's hasPrefix("zh") in Sources/Localization.swift.
+   CFBundleName is localized too: LaunchServices derives the Finder/Dock
+   display name from the localized CFBundleName on modern macOS. */
+"CFBundleDisplayName" = "雾凇词库更新器";
+"CFBundleName" = "雾凇词库更新器";

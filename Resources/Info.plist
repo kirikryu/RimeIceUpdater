@@ -2,12 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
     <key>CFBundleIdentifier</key>
     <string>local.rime.RimeIceUpdater</string>
     <key>CFBundleName</key>
     <string>RimeIceUpdater</string>
     <key>CFBundleDisplayName</key>
-    <string>雾凇词库更新器</string>
+    <string>RimeIceUpdater</string>
     <key>CFBundleExecutable</key>
     <string>RimeIceUpdater</string>
     <key>CFBundlePackageType</key>
