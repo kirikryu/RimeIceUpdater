@@ -153,7 +153,7 @@ struct StatusTab: View {
                         }
                     }
                     LabeledContent(L("检查频率", "Interval")) {
-                        Text(isZh ? "每周" + model.settings.weekdayName
+                        Text(isZh ? "每" + model.settings.weekdayName
                                   : "Weekly on " + model.settings.weekdayName)
                     }
                     if let next = Launchd.nextRun(model.settings) {
