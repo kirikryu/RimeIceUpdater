@@ -9,3 +9,9 @@ repos:
     rev: v8.30.1
     hooks:
       - id: gitleaks-system
+        # Upstream v8.30.1 omits pass_filenames: false for this hook id
+        # (the gitleaks / gitleaks-docker ids have it). Without the
+        # override pre-commit appends changed filenames to `gitleaks
+        # git ...`, which accepts at most one positional arg and errors
+        # out. Drop this once upstream ships the fix.
+        pass_filenames: false
